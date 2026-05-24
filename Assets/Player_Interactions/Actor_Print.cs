@@ -18,7 +18,7 @@ public class Actor_Print : MonoBehaviour
     /// <param name="message">출력할 메시지</param>
     public void Act_PrintMessage(string message)
     {
-        Debug.Log(message);
+        Debug.Log("<color=magenta>Actor_Print: " + message + "</color>");
     }
 
     /// <summary>
@@ -27,6 +27,6 @@ public class Actor_Print : MonoBehaviour
     /// </summary>
     public void Act_PrintMessage()
     {
-        Debug.Log(Message);
+        Debug.Log("<color=magenta>Actor_Print: " + Message + "</color>");
     }
 }

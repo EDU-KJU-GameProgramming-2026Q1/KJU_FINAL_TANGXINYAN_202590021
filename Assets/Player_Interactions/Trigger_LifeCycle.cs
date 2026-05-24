@@ -12,7 +12,8 @@ public class Trigger_LifeCycle : MonoBehaviour
     [Header("--------")]
 
     public GameObject InterfaceObject; // 인터페이스가 붙어있는 게임 오브젝트를 지정할 수 있도록 public으로 선언
-    IGeneral Interface;
+    IInteractable Interface;
+    //public _WIP_Actor_Text TextActor;
 
     [Header("지연된 실행: 카운더")]
     public float maxCount = 10f;
@@ -27,11 +28,11 @@ public class Trigger_LifeCycle : MonoBehaviour
     {
         if (InterfaceObject == null)
         {
-            Interface = GetComponent<IGeneral>();
+            Interface = GetComponent<IInteractable>();
         }
         else
         {
-            Interface = InterfaceObject.GetComponent<IGeneral>();
+            Interface = InterfaceObject.GetComponent<IInteractable>();
         }
     }
 
@@ -39,6 +40,27 @@ public class Trigger_LifeCycle : MonoBehaviour
     {
         Interface.OnStay();
     }
+
+    /*
+    private void Start()
+    {
+        Interface.OnAction();
+    }
+    private void Update()
+    {
+        if (isCount)
+        {
+            Count();
+            //OutputText();
+        }
+
+        if (isRun)
+        {
+            Timer();
+            //OutputText();
+        }
+    }
+    */
 
     private void OnEnable()
     {
@@ -51,4 +73,56 @@ public class Trigger_LifeCycle : MonoBehaviour
         Debug.Log($"{gameObject.name} disabled.");
         Interface.OnExit();
     }
+
+    /*
+    public void StartCounter()
+    {
+        isCount = true;
+    }
+
+    public void StartCounter(int _maxCount)
+    {
+        maxCount = _maxCount;
+        isCount = true;
+    }
+
+    void Count()
+    {
+        currentCount++;
+        if (currentCount >= maxCount)
+        {
+            currentCount = 0;
+            isCount = false;
+            Interface.OnAction();
+        }
+    }
+
+    public void StartTimer(float _maxTime)
+    {
+        maxTime = _maxTime;
+        isRun = true;
+    }
+
+    public void StartTimer()
+    {
+        isRun = true;
+    }
+
+    void Timer()
+    {
+        currentCount += Time.deltaTime;
+        if (currentCount >= maxTime)
+        {
+            currentCount = 0;
+            isRun = false;
+            Interface.OnAction();
+        }
+    }
+
+    public void OutputText(Actor_Text TextActor)
+    {
+        if (TextActor == null) return;
+        TextActor.Act_SetText();
+    }
+    */
 }

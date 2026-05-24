@@ -24,7 +24,7 @@ public class Trigger_Collision : MonoBehaviour
     [Header("Interface가 붙어있는 게임오브젝트")]
     [Tooltip("Interface가 붙어있는 게임오브젝트 할당 \nInterface 컴포넌트는 할당할 수 없음 \n미할당시 현재 게임오브젝트에서 Interface 컴포넌트를 찾음")]
     public GameObject InterfaceObject; 
-    IGeneral Interface;
+    IInteractable Interface;
 
     void Awake(){
         // Debug.unityLogger.logEnabled = false;
@@ -33,7 +33,11 @@ public class Trigger_Collision : MonoBehaviour
             InterfaceObject = gameObject;
         }
             
-        Interface = InterfaceObject.GetComponent<IGeneral>();
+        if(specificTarget == null && targetTags.Count == 0){
+            Debug.LogWarning($"<color=yellow>[Trigger_Collision]</color> {gameObject.name}에 필터가 설정되지 않았습니다. 모든 충돌체에 반응합니다.");
+        }
+        
+        Interface = InterfaceObject.GetComponent<IInteractable>();
     }
 
     // 필터링 로직: 아래 함수가 true를 반환할 때만 이벤트 실행함
