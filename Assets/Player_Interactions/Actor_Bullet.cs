@@ -3,7 +3,8 @@
 public class Actor_Bullet : MonoBehaviour
 {
     public GameObject MissEffect, HitEffect;
-    private float bulletDamage;    
+    public GameObject ShootSound, HitSound;
+    private float bulletDamage = 5f;    
     private bool isHit = false;  
 
     private Rigidbody rb;
@@ -32,94 +33,95 @@ public class Actor_Bullet : MonoBehaviour
     {
         if (isHit) return;
 
-        if (collision.gameObject.CompareTag("Target"))
+        ContactPoint contactPoint = collision.contacts[0];
+        if (collision.gameObject.CompareTag("Player"))
         {
+            Debug.Log($"[OnTriggerEnter] Hit {collision.gameObject.name}! Damage: " + bulletDamage);
             isHit = true;
-            Debug.Log("[OnCollisionEnter] Hit Target! Damage: " + bulletDamage);
-            // 피스톨/라이플 여부에 따라 적절한 calibTime(초) 전달 (예: 0.01f)
-            // ShowEffect(HitEffect);
-            ShowEffect(HitEffect, 0.005f);
+            ShowEffect(HitEffect, contactPoint); 
+            //ScoreManager.Instance.AddScore(-10);    
+            collision.gameObject.GetComponent<PlayerHealth>().TakeDamage(bulletDamage);   
+            Destroy(gameObject);
+        } 
+        else if(collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log($"[OnTriggerEnter] Hit {collision.gameObject.name}! Damage: " + bulletDamage);
+            isHit = true;
+            ShowEffect(HitEffect, contactPoint);
+            //ScoreManager.Instance.AddScore(10);          
+            collision.gameObject.GetComponent<EnemyHealth>().TakeDamage(bulletDamage);
+            Destroy(gameObject);
         }        
+        else if(collision.gameObject.CompareTag("Shootable"))
+        {
+            // Debug.Log("[OnCollisionEnter] Miss Target! No Damage");
+            ShowEffect(MissEffect, contactPoint);
+            Destroy(gameObject);
+        }
         else
         {
-            Debug.Log("[OnCollisionEnter] Miss Target! Damage: " + bulletDamage);
-            // ShowEffect(MissEffect);
-            ShowEffect(MissEffect, 0.005f);
+            Destroy(gameObject, 2f);    
         }
         
-        Destroy(gameObject);
+        
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (isHit) return;
 
-        if (other.CompareTag("Target"))
+        Vector3 contactPoint = other.ClosestPoint(transform.position);
+        if (other.CompareTag("Player")){
+            isHit = true;
+            Debug.Log($"[OnTriggerEnter] Hit {other.name}! Damage: " + bulletDamage);
+            ShowEffect(HitEffect, contactPoint);
+
+            //ScoreManager.Instance.AddScore(-10);
+            other.GetComponent<PlayerHealth>().TakeDamage(bulletDamage);
+            Destroy(gameObject);
+        } 
+        else if(other.CompareTag("Enemy"))
         {
             isHit = true;
-            Debug.Log("[OnTriggerEnter] Hit Target! Damage: " + bulletDamage);
-            // ShowEffect(HitEffect);
-            ShowEffect(HitEffect, 0.01f);
+            Debug.Log($"[OnTriggerEnter] Hit {other.name}! Damage: " + bulletDamage);
+            ShowEffect(HitEffect, contactPoint);
+
+            //ScoreManager.Instance.AddScore(10);
+            other.GetComponent<EnemyHealth>().TakeDamage(bulletDamage);
+            Destroy(gameObject);
+        }
+        else if(other.CompareTag("Shootable"))
+        {
+            Debug.Log($"[OnTriggerEnter] Miss {other.name} ");
+            ShowEffect(MissEffect, contactPoint);
+            Destroy(gameObject);
         }
         else
         {
-            Debug.Log("[OnTriggerEnter] Miss Target! Damage: " + bulletDamage);
-            // ShowEffect(MissEffect);
-            ShowEffect(MissEffect, 0.01f);
+            Destroy(gameObject, 2f);    
         }
         
-        Destroy(gameObject);
+        // Destroy(gameObject);
     }
 
-    /*
-    // 속도 비례형 이펙트 생성 함수 (보완 완료)
-    
-    void ShowEffect(GameObject Effect, float calibTime)
+    void ShowEffect(GameObject Effect, ContactPoint contactPoint)
     {
-        // [보완] 스크립트가 비활성화되었을 때 lastVelocity가 없을 수 있으므로 안전장치 추가
-        if (rb == null) rb = GetComponent<Rigidbody>();
-    
-        // 현재 충돌해서 0이 되었을지도 모르는 rb.velocity 대신, FixedUpdate에서 기록한 lastVelocity를 사용
-        Vector3 bulletSpeed = lastVelocity; 
-
-        // 예외 처리: 만약 기록된 속도마저 거의 없다면 Rigidbody 속도나마 대안으로 사용
-        if (bulletSpeed.sqrMagnitude < 0.001f && rb != null)
-        {
-            bulletSpeed = rb.velocity;
-        }
-
-        // 만약 완전히 멈춰있는 상태라면 오프셋 없이 현재 위치에 생성
-        Vector3 pos = transform.position;
-    
-        // 기본 회전값
-        Quaternion dir = transform.rotation;
-
-        if (bulletSpeed.sqrMagnitude > 0.001f)
-        {
-            // 현재 위치 - (직전 탄속 * 시간) = 정확히 속도에 비례한 뒤쪽 위치
-            pos = transform.position - (bulletSpeed * calibTime);
-        
-            // [수정 핵심] 날아가던 방향 그대로 이펙트를 정렬하되, 로컬 오프셋을 적용합니다.
-        
-            // 1. 먼저 이펙트의 Z축(앞)을 총알 날아가는 방향으로 맞춥니다.
-            //Quaternion bulletForwardRotation = Quaternion.LookRotation(bulletSpeed.normalized);
-
-            // 2. [추가] 이펙트 모델링의 실제 방향(보통 Y축)을 총알 뒤쪽으로 꺾어주는 오프셋을 계산합니다.
-            // 대부분의 이펙트는 Y축이 위로 뻗으므로, X축을 -90도 회전시켜 Z축(앞) 방향으로 눕힙니다.
-            // 만약 뱡향이 여전히 이상하다면 (90f, 0f, 0f)로 바꿔보세요.
-            //Quaternion localOffset = Quaternion.Euler(-90f, 0f, 0f); 
-
-            // 3. 월드 회전과 로컬 오프셋을 곱하여 최종 회전값을 만듭니다. (순서 주의: World * Local)
-            //dir = bulletForwardRotation;
-            //dir = bulletForwardRotation * localOffset;
-        }
-
+        // Vector3 pos = contactPoint.point; // 부딪힌 벽면/몸통 표면 좌표
+        Vector3 pos = contactPoint.point + (contactPoint.normal * 0.05f); // 부딪힌 벽면/몸통 표면 좌표
+        Quaternion dir = Quaternion.LookRotation(contactPoint.normal);
         GameObject hitEffectClone = Instantiate(Effect, pos, dir);
         Destroy(hitEffectClone, 2f);
     }
-    */
 
-    
+    void ShowEffect(GameObject Effect, Vector3 contactPoint)
+    {
+        Vector3 surfaceNormal = (transform.position - contactPoint).normalized;
+        Vector3 pos = contactPoint + (surfaceNormal * 0.05f);        
+        Quaternion dir = Quaternion.LookRotation(surfaceNormal);
+        GameObject hitEffectClone = Instantiate(Effect, pos, dir);
+        Destroy(hitEffectClone, 2f);
+    }
+
     void ShowEffect(GameObject Effect, float calibTime)
     {
         // [수정] 현재 충돌해서 0이 되었을지도 모르는 rb.velocity 대신, 우리가 기록한 lastVelocity를 사용합니다.
@@ -147,7 +149,6 @@ public class Actor_Bullet : MonoBehaviour
         Destroy(hitEffectClone, 2f);
     }
     
-    
 
     void ShowEffect(GameObject Effect)
     {
@@ -157,4 +158,5 @@ public class Actor_Bullet : MonoBehaviour
 
         GameObject hitEffectClone = Instantiate(Effect, pos, dir);
         Destroy(hitEffectClone, 2f);
-    }}
+    }
+}

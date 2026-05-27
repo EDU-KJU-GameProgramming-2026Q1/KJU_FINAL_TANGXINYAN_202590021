@@ -12,9 +12,9 @@ public class Actor_Animation : MonoBehaviour
     public Animator animator;
     [Tooltip("Animator의 Parameters에 있는 \n하나의 Parameter 이름 입력. \n이벤트(Interfce) 컴포넌트에서 사용 \n미입력시 'State'로 자동 설정")]
     public string stateName = "FullAnimation"; // 애니메이터 내 State 이름
-    public int totalFrames = 60; // 전체 클립의 프레임 수
     [Tooltip("Animator의 Parameters에 있는 \n하나의 Parameter 이름 입력. 이벤트(Interfce) 컴포넌트")]
-    public string param = "State";
+    public string paramName = "Speed";
+    public int totalFrames = 60; // 전체 클립의 프레임 수
     float defaultSpeed = 1f, currentSpeed;
 
     void Awake()
@@ -28,7 +28,7 @@ public class Actor_Animation : MonoBehaviour
     /// <param name="value"></param>
     public void Act_SetInteger(int value)
     {
-        animator.SetInteger(param, value);
+        animator.SetInteger(paramName, value);
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public class Actor_Animation : MonoBehaviour
         Debug.Log($"Setting Animation Speed to: {targetSpeed}");
         // Animator.speed 대신 파라미터를 조절합니다.
         // targetSpeed에 -1.0f을 넣으면 즉시 역재생됩니다.
-        animator.SetFloat("AniSpeed", targetSpeed);
+        animator.SetFloat(paramName, targetSpeed);
         
         // 만약 이미 끝부분(1.0)에서 멈춰있다면 강제로 재생 명령을 다시 줍니다.
         if (targetSpeed < 0)
@@ -102,5 +102,21 @@ public class Actor_Animation : MonoBehaviour
         // 4. 즉시 반영을 위해 애니메이터 강제 업데이트
         animator.Update(0f);
         Act_ResetSpeed(); // 재생 속도를 기본값으로 리셋하여 애니메이션이 정상적으로 재생되도록 함
+    }
+
+    /// <summary>
+    /// 애니메이션을 정상 속도(1.0)로 정재생합니다.
+    /// </summary>
+    public void Act_PlayFW()
+    {
+        Act_SetSpeed(defaultSpeed);
+    }
+
+    /// <summary>
+    /// 애니메이션을 반대 속도(-1.0)로 역재생합니다.
+    /// </summary>
+    public void Act_PlayREV()
+    {
+        Act_SetSpeed(-defaultSpeed * 1f); // -1.0f 전달
     }
 }

@@ -89,10 +89,10 @@ public class TeleportBehavior : MonoBehaviour
     /// <summary>
     /// 플레이어 이동 상태 변경에 대응하는 이벤트 핸들러
     /// </summary>
-    private void HandleMoveStateChanged(PlayerMoveState newState)
+    private void HandleMoveStateChanged(PlayerMovementState newState)
     {
         // 상태가 다른 비헤이비어(예: Climb 등)에 의해 주도권을 뺏기면 텔레포트 비주얼을 강제 종료합니다.
-        if (newState != PlayerMoveState.Teleport && newState != PlayerMoveState.Ground)
+        if (newState != PlayerMovementState.Teleport && newState != PlayerMovementState.Ground)
         {
             StopTeleportVisuals();
         }
@@ -111,14 +111,14 @@ public class TeleportBehavior : MonoBehaviour
             {
                 isTeleportCanceled = true;
                 StopTeleportVisuals();
-                PlayerManager.Instance.SetMoveState(PlayerMoveState.Ground);
+                PlayerManager.Instance.SetMoveState(PlayerMovementState.Ground);
                 return;
             }
 
             if (!isTeleportCanceled)
             {
                 // 현재 이동 상태를 주도적으로 Teleport 상태로 전환하고 궤적을 그립니다.
-                PlayerManager.Instance.SetMoveState(PlayerMoveState.Teleport);
+                PlayerManager.Instance.SetMoveState(PlayerMovementState.Teleport);
                 UpdateTeleportPointer();
             }
         }
@@ -312,6 +312,6 @@ public class TeleportBehavior : MonoBehaviour
     {
         isTeleportCanceled = false;
         StopTeleportVisuals();
-        PlayerManager.Instance.SetMoveState(PlayerMoveState.Ground);
+        PlayerManager.Instance.SetMoveState(PlayerMovementState.Ground);
     }
 }

@@ -39,7 +39,7 @@ public class Actor_Rifle : InterfaceBase_IItem
 
     void Fire()
     {
-        Debug.Log("탕! (라이플 연사)");
+        //Debug.Log("탕! (라이플 연사)");
         // 총구의 위치와 회전값을 그대로 가져옵니다 (이미 월드 기준 좌표임)
         Vector3 pos = FirePoint.position;
         Quaternion dir = FirePoint.rotation;

@@ -14,7 +14,7 @@ public class Actor_Item : MonoBehaviour
 
     public void Act_SetState(GameObject sender)
     {
-        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Item);
+        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Looting);
         Debug.Log("Actor_SetState");
     }
 

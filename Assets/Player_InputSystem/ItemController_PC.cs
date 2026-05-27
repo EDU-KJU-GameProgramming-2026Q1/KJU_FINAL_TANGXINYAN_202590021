@@ -32,7 +32,7 @@ public class ItemController_PC : MonoBehaviour
         }
 
         // 현재 플레이어 상태가 '순수 그랩(Grab)' 상태일 때만 체크
-        bool isPureGrabbing = PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grab;
+        bool isPureGrabbing = PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grabing;
 
         if (isPureGrabbing)
         {

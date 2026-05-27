@@ -60,7 +60,7 @@ public class PointingBehavior : MonoBehaviour
         if (HitPointer != null) HitPointer.SetActive(false);
 
         // [최적화] 시작 시점에 이미 아이템을 들고 있는 상태라면 비각성화 처리
-        if (PlayerManager.Instance != null && PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Item)
+        if (PlayerManager.Instance != null && PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Looting)
         {
             CleanUpInteraction();
             enabled = false;
@@ -73,7 +73,7 @@ public class PointingBehavior : MonoBehaviour
     private void HandlePlayerStateChanged(PlayerInteractionState newState)
     {
         // 아이템 장착 상태(Item)가 되면 시각 효과와 인터페이스를 먼저 완벽히 정리(CleanUp)한 후 컴포넌트를 끔
-        if (newState == PlayerInteractionState.Item)
+        if (newState == PlayerInteractionState.Looting)
         {
             CleanUpInteraction(); // 잔상 제거 및 상호작용 강제 종료
             enabled = false;

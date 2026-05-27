@@ -32,7 +32,7 @@ public class GrabBehavior : MonoBehaviour
     void Update()
     {
         // 아이템을 이미 장착해서 손에 들고 있다면 그랩 로직 아예 중단
-        if (PlayerManager.Instance.CurrentInteractionState == PlayerInteractionState.Item)
+        if (PlayerManager.Instance.CurrentInteractionState == PlayerInteractionState.Looting)
         {
             return;
         }
@@ -44,14 +44,14 @@ public class GrabBehavior : MonoBehaviour
         if (IsGrabbing) // Release 처리
         {
             // 현재 상태가 Grab이 아니라면 GrabBehavior는 놓기 처리를 무시함
-            if (PlayerManager.Instance.GetInteractionState() != PlayerInteractionState.Grab) return;
+            if (PlayerManager.Instance.GetInteractionState() != PlayerInteractionState.Grabing) return;
 
             //Debug.Log($"<color=cyan>[GrabBehavior]</color> Grabing Grabable.");
 
             if (grabInput.Release)
             {
                 Debug.Log($"<color=cyan>[GrabBehavior]</color> <b>grabInput.Release :</b> {GrabbingObject.name}");
-                if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grab)
+                if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grabing)
                 {
                     Debug.Log($"<color=cyan>[GrabBehavior]</color> <b>Released:</b> {GrabbingObject.name}");
                     GrabbingObject.GetComponent<Actor_Grabable>().Act_Release(grabingHand.gameObject);
@@ -68,31 +68,31 @@ public class GrabBehavior : MonoBehaviour
         {
             Debug.Log($"[GrabBehavior] grabInput.DistanceGrab");
             RaycastHit? hit = pointingBehavior.GetRayHit();
-            if (hit.HasValue)
+            if(!hit.HasValue) return;
+            // [추가] IInteractable 인터페이스가 있는지 먼저 확인
+            if (hit.Value.collider.TryGetComponent<IInteractable>(out _))
             {
-                // [추가] IInteractable 인터페이스가 있는지 먼저 확인
-                if (hit.Value.collider.TryGetComponent<IInteractable>(out _))
+                if (hit.Value.collider.TryGetComponent<Actor_Grabable>(out var grabActor))
                 {
-                    if (hit.Value.collider.TryGetComponent<Actor_Grabable>(out var grabActor))
-                    {
-                        //ExecuteGrab(grabActor); // 그랩 실행 로직을 별도 메서드로 분리하면 깔끔합니다.
-                        GrabbingObject = grabActor.gameObject; // 관리용 참조
-                        grabActor.Act_DistanceGrab(grabingHand.gameObject);
+                    //ExecuteGrab(grabActor); // 그랩 실행 로직을 별도 메서드로 분리하면 깔끔합니다.
+                    GrabbingObject = grabActor.gameObject; // 관리용 참조
+                    grabActor.Act_DistanceGrab(grabingHand.gameObject);
 
-                        Debug.Log($"<color=cyan>[Grab]</color> <b>DistanceGrab:</b> {GrabbingObject.name}");
+                    Debug.Log($"<color=cyan>[Grab]</color> <b>DistanceGrab:</b> {GrabbingObject.name}");
 
-                        //PlayerManager.Instance.SetCurrentObject(GrabbingObject);
-                        PlayerManager.Instance.CurrentObject = GrabbingObject;
-                        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grab);
-                    }
+                    //PlayerManager.Instance.SetCurrentObject(GrabbingObject);
+                    PlayerManager.Instance.CurrentObject = GrabbingObject;
+                    PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grabing);
                 }
             }
+            
         }
 
         if (grabInput.DistancePull)
         {
             Debug.Log($"<color=cyan>[GrabBehavior]</color> grabInput.DistancePull");
             RaycastHit? hit = pointingBehavior.GetRayHit();
+            if(!hit.HasValue) return;
             if (hit.Value.collider.TryGetComponent<IInteractable>(out _))
             {
                 if (hit.Value.collider.TryGetComponent<Actor_Grabable>(out var grabActor))
@@ -104,7 +104,7 @@ public class GrabBehavior : MonoBehaviour
 
                      PlayerManager.Instance.CurrentObject = GrabbingObject;
                     //PlayerManager.Instance.SetCurrentObject(GrabbingObject);
-                    PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grab);
+                    PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grabing);
                 }
             }
         }

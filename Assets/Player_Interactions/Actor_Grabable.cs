@@ -52,7 +52,7 @@ public class Actor_Grabable : MonoBehaviour
     }
     public void Act_DistanceGrab(GameObject hand)
     {
-        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grab);
+        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grabing);
         if (isGrabbed) return;
         isGrabbed = true;
 

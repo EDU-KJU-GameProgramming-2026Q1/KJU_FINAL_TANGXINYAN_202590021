@@ -1,14 +1,6 @@
 ﻿using System;
 using UnityEngine;
 
-public enum TargetPlatform { PC, Quest }
-
-// [이동 상태] 현재 어떤 이동 컴포넌트가 주도권을 가졌는가?
-public enum PlayerMoveState { Ground, Air, Climb, Teleport }
-
-// [상호작용 상태] 손의 상태가 어떠한가?
-public enum PlayerInteractionState { Idle, Grab, Item }
-
 [RequireComponent(typeof(CharacterController))]
 public class PlayerManager : MonoBehaviour
 {
@@ -34,11 +26,11 @@ public class PlayerManager : MonoBehaviour
 
 
     [Header("Current States")]
-    public PlayerMoveState MoveState = PlayerMoveState.Ground;
+    public PlayerMovementState MoveState = PlayerMovementState.Ground;
     public PlayerInteractionState CurrentInteractionState = PlayerInteractionState.Idle;
 
     //[Header("Event")]
-    public event Action<PlayerMoveState> OnMoveStateChanged;
+    public event Action<PlayerMovementState> OnMoveStateChanged;
     public event Action<PlayerInteractionState> OnInteractionStateChanged;
 
 
@@ -116,44 +108,13 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    /*
-    private void InitializePlatform()
-    {
-        if (PlatformConfig == null) return;
-
-        // 1. 자식들 중에서 '주소록(PlatformRigReferences)'을 가진 오브젝트들을 다 찾습니다.
-        // true를 넣으면 켜져있든 꺼져있든 다 찾아옵니다.
-        PlatformRigReferences[] allRigs = GetComponentsInChildren<PlatformRigReferences>(true);
-
-        foreach (var rig in allRigs)
-        {
-            // 2. SO 에셋에 적힌 플랫폼과 일치하는지 확인
-            if (rig.Platform == PlatformConfig.CurrentPlatform)
-            {
-                rig.gameObject.SetActive(true); // 켜기
-
-                // 최종 주소록 등록
-                playerCamera = rig.MainCamera;
-                pointingHand = rig.PointingHand;
-                teleportHand = rig.TeleportHand;
-                grabHand = rig.GrabHand;
-                itemHand = rig.ItemHand;
-            }
-            else
-            {
-                rig.gameObject.SetActive(false); // 안 쓰는 플랫폼은 자동으로 끄기
-            }
-        }
-    }
-    */
-
     public Transform GetCamera() => playerCamera;
     public Transform GetPointingHand() => pointingHand;
     public Transform GetTeleportHand() => teleportHand;
     public Transform GetGrabHolder() => grabHolder;
     public Transform GetItemHolder() => itemHolder;
 
-    public void SetMoveState(PlayerMoveState newState)
+    public void SetMoveState(PlayerMovementState newState)
     {
         if (MoveState == newState) return;
 
@@ -163,7 +124,7 @@ public class PlayerManager : MonoBehaviour
         OnMoveStateChanged?.Invoke(newState);
     }
 
-    public PlayerMoveState GetCurrentMoveState() => MoveState;
+    public PlayerMovementState GetCurrentMoveState() => MoveState;
 
     public void SetInteractionState(PlayerInteractionState newState)
     {

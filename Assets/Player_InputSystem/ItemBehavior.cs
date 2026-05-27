@@ -142,7 +142,7 @@ public class ItemBehavior : MonoBehaviour
     public void TryEquip()
     {
         // [추가된 안전장치] 무언가를 그랩 중이거나 손에 들고 있다면 아이템 장착 불가
-        if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grab ||
+        if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grabing ||
             PlayerManager.Instance.CurrentObject != null)
         {
             Debug.Log("<color=yellow>[ItemBehavior]</color> 무언가를 잡고 있는 상태(Grab)에서는 아이템을 꺼낼 수 없습니다.");
@@ -180,7 +180,7 @@ public class ItemBehavior : MonoBehaviour
         else
         {
             // [추가된 안전장치] 꺼내려고 할 때(가방에서 추출) 그랩 중이면 차단
-            if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grab ||
+            if (PlayerManager.Instance.GetInteractionState() == PlayerInteractionState.Grabing ||
                 PlayerManager.Instance.CurrentObject != null)
             {
                 Debug.Log("<color=yellow>[ItemBehavior]</color> 무언가를 잡고 있는 상태에서는 아이템을 꺼낼 수 없습니다.");
@@ -218,7 +218,7 @@ public class ItemBehavior : MonoBehaviour
         //PlayerManager.Instance.SetCurrentObject(itemBase.gameObject);
 
         Debug.Log($"<color=cyan>[ItemBehavior]</color> Equip --> SetInteractionState");
-        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Item);
+        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Looting);
         Debug.Log($"<color=cyan>[ItemBehavior]</color> Equip: {itemBase.name} 완료. CurrentInteractionState={PlayerManager.Instance.CurrentInteractionState}, CurrentObject={PlayerManager.Instance.CurrentObject.name}");
         Debug.Log($"<color=cyan>[ItemBehavior]</color> Equip --> EquipFromInventory");
     }

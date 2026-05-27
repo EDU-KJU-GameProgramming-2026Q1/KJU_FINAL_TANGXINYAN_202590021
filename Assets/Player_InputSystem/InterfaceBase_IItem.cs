@@ -49,26 +49,6 @@ public class InterfaceBase_IItem : Actor_Grabable, IItem
 
         Debug.Log($"<color=green>[InterfaceBase_IItem]</color> OnEquip: {itemData.Name}이 손에 고정되었습니다");
     }
-    /*
-    public virtual void OnEquip(GameObject itemHolder) // itemHolder = 장착/고정할 대상
-    {
-        // 1. 물리 시뮬레이션 완전 정지
-        if (TryGetComponent<Rigidbody>(out var rb))
-        {
-            rb.isKinematic = true;
-            rb.useGravity = false;
-        }
-
-        // 2. 부모를 ItemHolder로 설정하고 위치/회전값 리셋
-        transform.SetParent(itemHolder.transform);
-
-        // 아이템 전용 위치(ItemUseOffset)로 정렬
-        transform.localPosition = ItemUseOffset;
-        transform.localRotation = Quaternion.identity;
-
-        Debug.Log($"<color=green>[ItemBsse]</color> {itemData.Name}이 손에 고정되었습니다");
-    }
-    */
 
     public virtual void OnUnEquip(GameObject sender) // sender = 대상을 장착/고정하는 Holder
     {

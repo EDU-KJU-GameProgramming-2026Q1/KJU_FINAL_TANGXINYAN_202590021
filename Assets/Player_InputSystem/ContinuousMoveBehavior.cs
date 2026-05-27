@@ -53,9 +53,9 @@ public class ContinuousMoveBehavior : MonoBehaviour
     {
         if (input == null || character == null || !character.enabled) return;
 
-        PlayerMoveState currentMoveState = PlayerManager.Instance.GetCurrentMoveState();
+        PlayerMovementState currentMoveState = PlayerManager.Instance.GetCurrentMoveState();
         // 회전 및 이동 상태 처리
-        if (currentMoveState != PlayerMoveState.Teleport)
+        if (currentMoveState != PlayerMovementState.Teleport)
         {
             HandleSnapTurn();
             HandleMoveState(currentMoveState);
@@ -64,13 +64,13 @@ public class ContinuousMoveBehavior : MonoBehaviour
         character.Move(moveVelocity * Time.deltaTime);
     }
 
-    void HandleMoveState(PlayerMoveState state)
+    void HandleMoveState(PlayerMovementState state)
     {
         switch (state)
         {
-            case PlayerMoveState.Ground: MoveGround(); break;
-            case PlayerMoveState.Air: MoveAir(); break;
-            case PlayerMoveState.Climb: MoveVertical(); break;
+            case PlayerMovementState.Ground: MoveGround(); break;
+            case PlayerMovementState.Air: MoveAir(); break;
+            case PlayerMovementState.Climb: MoveVertical(); break;
                 // case playerState.Teleport: 삭제 (Update에서 직접 관리)
         }
     }
@@ -103,7 +103,7 @@ public class ContinuousMoveBehavior : MonoBehaviour
         {
             Debug.Log("Jump!");
             moveVelocity.y = Mathf.Sqrt(JumpHeight * -2f * gravity);
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Air);
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Air);
             currentMoveState = playerState.Air;
         }
         else
@@ -114,7 +114,7 @@ public class ContinuousMoveBehavior : MonoBehaviour
         // 낙하 감지 (땅에서 떨어짐)
         if (!character.isGrounded && moveVelocity.y < 0)
         {
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Air);
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Air);
             currentMoveState = playerState.Air;
         }
     }
@@ -127,7 +127,7 @@ public class ContinuousMoveBehavior : MonoBehaviour
         moveVelocity.z = dirInput.z * WalkSpeed;
         moveVelocity.y += gravity * Time.deltaTime;
 
-        if (character.isGrounded) PlayerManager.Instance.SetMoveState(PlayerMoveState.Ground);
+        if (character.isGrounded) PlayerManager.Instance.SetMoveState(PlayerMovementState.Ground);
         if (character.isGrounded) currentMoveState = playerState.Ground;
     }
 
@@ -149,7 +149,7 @@ public class ContinuousMoveBehavior : MonoBehaviour
         {
             Vector3 jumpDir = -transform.forward + Vector3.up;
             moveVelocity = jumpDir.normalized * Mathf.Sqrt(JumpHeight * -2f * gravity);
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Air);
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Air);
             currentMoveState = playerState.Air;
         }
     }
@@ -177,10 +177,10 @@ public class ContinuousMoveBehavior : MonoBehaviour
     {
         if (other.CompareTag("ClimbableLadder")) { 
             currentClimbType = climbType.Ladder; 
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Climb); }
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Climb); }
         if (other.CompareTag("ClimbableCliff")) { 
             currentClimbType = climbType.Cliff; 
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Climb); 
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Climb); 
         }
     }
 
@@ -189,7 +189,7 @@ public class ContinuousMoveBehavior : MonoBehaviour
         if (other.CompareTag("ClimbableLadder") || other.CompareTag("ClimbableCliff"))
         {
             currentClimbType = climbType.None;
-            PlayerManager.Instance.SetMoveState(PlayerMoveState.Air);
+            PlayerManager.Instance.SetMoveState(PlayerMovementState.Air);
         }
     }
 }
