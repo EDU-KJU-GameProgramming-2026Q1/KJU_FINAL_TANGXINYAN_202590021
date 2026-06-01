@@ -8,52 +8,114 @@ public class Actor_Rifle : InterfaceBase_IItem
     public float BulletSpeed = 100f;
     public float BulletDamage = 5f;
 
+    [Header("Ammo Options")]
+    public int MagazineSize = 30;
+    public int CurrentAmmo = 30;
+    public int ReserveAmmo = 90;
+
     private bool isFiring = false;
     private float lastFireTime;
 
-    // 1. 발사 시작 (ItemBehavior에서 호출됨)
+    public override void OnEquip(GameObject itemHolder)
+    {
+        base.OnEquip(itemHolder);
+        UpdateAmmoUI();
+    }
+
+    public override void OnUnEquip(GameObject sender)
+    {
+        isFiring = false;
+        base.OnUnEquip(sender);
+
+        if (AmmoUI.Instance != null)
+        {
+            AmmoUI.Instance.HideAmmo();
+        }
+    }
+
     public override void OnUse()
     {
         isFiring = true;
     }
 
-    // 2. 발사 중단 (아이템을 뗄 때 호출되도록 부모에 정의되어 있어야 함)
     public override void OnStopUse()
     {
         isFiring = false;
     }
 
+    public override void OnReload()
+    {
+        Reload();
+    }
+
     private void Update()
     {
-        // 마우스 버튼을 누르고 있는 상태라면
-        if (isFiring)
+        if (!isFiring) return;
+
+        if (Time.time >= lastFireTime + itemData.FireRate)
         {
-            // 발사 간격 체크 (itemData에 FireRate가 있다고 가정)
-            if (Time.time >= lastFireTime + itemData.FireRate)
-            {
-                Fire();
-                lastFireTime = Time.time;
-            }
+            Fire();
+            lastFireTime = Time.time;
         }
     }
 
     void Fire()
     {
-        //Debug.Log("탕! (라이플 연사)");
-        // 총구의 위치와 회전값을 그대로 가져옵니다 (이미 월드 기준 좌표임)
+        if (CurrentAmmo <= 0)
+        {
+            isFiring = false;
+            Debug.Log("[Rifle] No ammo. Reload!");
+            UpdateAmmoUI();
+            return;
+        }
+
+        CurrentAmmo--;
+        UpdateAmmoUI();
+
         Vector3 pos = FirePoint.position;
         Quaternion dir = FirePoint.rotation;
 
         GameObject bulletClone = Instantiate(Bullet, pos, dir);
         bulletClone.GetComponent<Actor_Bullet>().SetDamage(BulletDamage);
-        
+
         Rigidbody rb = bulletClone.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // 총구가 바라보는 앞방향(forward)으로 발사
             rb.AddForce(FirePoint.forward * BulletSpeed, ForceMode.VelocityChange);
         }
 
         Destroy(bulletClone, 2f);
+    }
+
+    void Reload()
+    {
+        if (CurrentAmmo >= MagazineSize) return;
+        if (ReserveAmmo <= 0) return;
+
+        int needAmmo = MagazineSize - CurrentAmmo;
+        int reloadAmmo = Mathf.Min(needAmmo, ReserveAmmo);
+
+        CurrentAmmo += reloadAmmo;
+        ReserveAmmo -= reloadAmmo;
+
+        UpdateAmmoUI();
+
+        Debug.Log($"[Rifle] Reloaded: {CurrentAmmo}/{ReserveAmmo}");
+    }
+
+    void UpdateAmmoUI()
+    {
+        if (AmmoUI.Instance != null)
+        {
+            AmmoUI.Instance.ShowAmmo(CurrentAmmo, ReserveAmmo);
+        }
+    }
+
+    public void AddReserveAmmo(int amount)
+    {
+        ReserveAmmo += amount;
+        UpdateAmmoUI();
+
+        Debug.Log($"[Rifle] Ammo picked up: +{amount}. ReserveAmmo={ReserveAmmo}");
     }
 }

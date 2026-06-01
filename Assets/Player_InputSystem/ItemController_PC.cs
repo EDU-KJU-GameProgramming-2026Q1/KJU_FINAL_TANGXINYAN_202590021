@@ -12,6 +12,7 @@ public class ItemController_PC : MonoBehaviour
     public InputActionProperty EquipAction;
     public InputActionProperty UnEquipAction;
     public InputActionProperty DropAction;
+    public InputActionProperty ReloadAction;
 
     public InputActionProperty UseAction;
     public InputActionProperty StopUseAction;
@@ -49,6 +50,7 @@ public class ItemController_PC : MonoBehaviour
         else if (EquipAction.action.WasPressedThisFrame()) itemBehavior.ToggleEquip();
         else if (UnEquipAction.action.WasPressedThisFrame()) itemBehavior.ToggleEquip(); // 언이큅 가능!
         else if (DropAction.action.WasPressedThisFrame()) itemBehavior.TryDrop();       // 버리기 가능!
+        else if (ReloadAction.action.WasPressedThisFrame()) itemBehavior.Reload();
 
         // 아이템 간 스위칭 (썸스틱 / 마우스 휠)
         HandleItemSwitching();
@@ -59,6 +61,8 @@ public class ItemController_PC : MonoBehaviour
             if (UseAction.action.WasPressedThisFrame()) itemBehavior.Use();
             if (StopUseAction.action.WasReleasedThisFrame()) itemBehavior.StopUse();
         }
+
+
     }
 
     /*
@@ -134,7 +138,8 @@ public class ItemController_PC : MonoBehaviour
             SwapAction, ScrollAction,
             EquipAction, UnEquipAction,
             UseAction, StopUseAction, 
-            DropAction
+            DropAction,
+            ReloadAction
         };
 
         foreach (var property in allActions)

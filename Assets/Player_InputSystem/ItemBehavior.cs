@@ -253,6 +253,21 @@ public class ItemBehavior : MonoBehaviour
 
     }
 
+    public void ConsumeEquippedItem()
+    {
+        if (itemBase == null) return;
+
+        InterfaceBase_IItem consumedItem = itemBase;
+
+        inventory.Remove(consumedItem);
+        itemBase = null;
+
+        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Idle);
+        PlayerManager.Instance.CurrentObject = null;
+
+        Destroy(consumedItem.gameObject);
+    }
+
     public void Drop()
     {
         if (itemBase == null) return;
@@ -309,4 +324,6 @@ public class ItemBehavior : MonoBehaviour
     {
         Debug.Log($"<color=cyan>[ItemBehavior]</color> Removing {itemIndex} from Inventory.");
     }
+
+    public void Reload() => itemBase?.OnReload();
 }

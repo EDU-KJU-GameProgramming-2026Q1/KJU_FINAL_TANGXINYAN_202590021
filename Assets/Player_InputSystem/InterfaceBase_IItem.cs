@@ -76,4 +76,9 @@ public class InterfaceBase_IItem : Actor_Grabable, IItem
         // 아이템은 보통 플레이어 시야를 가리지 않게 살짝 옆으로 치워줌
         //transform.localPosition = ItemUseOffset;
     }
+
+    public virtual void OnReload()
+    {
+        Debug.Log($"<color=green>[InterfaceBase_IItem]</color> {itemData.Name} reload");
+    }
 }

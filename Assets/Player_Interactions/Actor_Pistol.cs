@@ -8,29 +8,92 @@ public class Actor_Pistol : InterfaceBase_IItem
     public float BulletSpeed = 100f;
     public float BulletDamage = 1f;
 
+    [Header("Ammo Options")]
+    public int MagazineSize = 7;
+    public int CurrentAmmo = 7;
+    public int ReserveAmmo = 21;
+
+    public override void OnEquip(GameObject itemHolder)
+    {
+        base.OnEquip(itemHolder);
+        UpdateAmmoUI();
+    }
+
+    public override void OnUnEquip(GameObject sender)
+    {
+        base.OnUnEquip(sender);
+
+        if (AmmoUI.Instance != null)
+        {
+            AmmoUI.Instance.HideAmmo();
+        }
+    }
 
     public override void OnUse()
     {
         Fire();
     }
 
+    public override void OnReload()
+    {
+        Reload();
+    }
+
     void Fire()
     {
-        Debug.Log("탕! (피스톨 단사)");
-        // 총구의 위치와 회전값을 그대로 가져옵니다 (이미 월드 기준 좌표임)
+        if (CurrentAmmo <= 0)
+        {
+            Debug.Log("[Pistol] No ammo. Reload!");
+            return;
+        }
+
+        CurrentAmmo--;
+        UpdateAmmoUI();
+
         Vector3 pos = FirePoint.position;
         Quaternion dir = FirePoint.rotation;
 
         GameObject bulletClone = Instantiate(Bullet, pos, dir);
         bulletClone.GetComponent<Actor_Bullet>().SetDamage(BulletDamage);
-        
+
         Rigidbody rb = bulletClone.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // 총구가 바라보는 앞방향(forward)으로 발사
             rb.AddForce(FirePoint.forward * BulletSpeed, ForceMode.VelocityChange);
         }
 
         Destroy(bulletClone, 2f);
+    }
+
+    void Reload()
+    {
+        if (CurrentAmmo >= MagazineSize) return;
+        if (ReserveAmmo <= 0) return;
+
+        int needAmmo = MagazineSize - CurrentAmmo;
+        int reloadAmmo = Mathf.Min(needAmmo, ReserveAmmo);
+
+        CurrentAmmo += reloadAmmo;
+        ReserveAmmo -= reloadAmmo;
+
+        UpdateAmmoUI();
+
+        Debug.Log($"[Pistol] Reloaded: {CurrentAmmo}/{ReserveAmmo}");
+    }
+
+    void UpdateAmmoUI()
+    {
+        if (AmmoUI.Instance != null)
+        {
+            AmmoUI.Instance.ShowAmmo(CurrentAmmo, ReserveAmmo);
+        }
+    }
+
+    public void AddReserveAmmo(int amount)
+    {
+        ReserveAmmo += amount;
+        UpdateAmmoUI();
+
+        Debug.Log($"[Pistol] Ammo picked up: +{amount}. ReserveAmmo={ReserveAmmo}");
     }
 }

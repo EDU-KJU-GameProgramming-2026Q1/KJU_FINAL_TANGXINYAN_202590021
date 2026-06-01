@@ -41,6 +41,22 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void Heal(float healAmount)
+    {
+        if (isDead) return;
+
+        float oldHealth = currentHealth;
+        currentHealth = Mathf.Min(currentHealth + healAmount, maxHealth);
+        float actualHeal = currentHealth - oldHealth;
+
+        Debug.Log($"[Player] 회복! 현재 체력: {currentHealth}/{maxHealth}");
+
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddPlayerHealth(actualHeal);
+        }
+    }
+
     // 체력이 0 이하가 되었을 때 실행되는 함수
     private void Die()
     {

@@ -7,4 +7,6 @@ public interface IItem
     void OnEquip(GameObject sender);  // 장착 시 실행 (sender는 장착한 객체, 보통 플레이어)
     void OnUnEquip(GameObject sender);  // 장착 해제 시 실행 (sender는 해제한 객체, 보통 플레이어)
     void OnDrop(GameObject sender);
+    void OnReload();
 }
+
