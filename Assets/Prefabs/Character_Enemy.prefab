@@ -79,6 +79,7 @@ GameObject:
   - component: {fileID: 8287810307343130009}
   - component: {fileID: 6999959902925412830}
   - component: {fileID: 135630759100987321}
+  - component: {fileID: -2584094810176964794}
   m_Layer: 0
   m_Name: Character_Enemy
   m_TagString: Enemy
@@ -206,6 +207,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 20
   scoreReward: 100
+--- !u!114 &-2584094810176964794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718220906873060975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5c499f912e86d419e91e9fed5e1d80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 2
+  TurnSpeed: 5
+  MoveRadius: 5
+  ArriveDistance: 0.3
+  MinWaitTime: 1
+  MaxWaitTime: 3
+  ObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  WallCheckDistance: 0.8
 --- !u!1 &1807145830061951624
 GameObject:
   m_ObjectHideFlags: 0
