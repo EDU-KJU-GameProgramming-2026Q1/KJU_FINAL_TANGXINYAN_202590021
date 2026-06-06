@@ -23,6 +23,7 @@ public class Actor_Grabable : MonoBehaviour
     private Rigidbody rb;
     private bool isGrabbed = false;
     private bool isPulling = false;
+    private Coroutine pullRoutine;
     //public float pokeForce = 5f;       // 미는 세기
     //public float releaseForce = 5f;       // 던지는 세기
     //public float upwardForce = 2f;      // 약간 위로 솟구치게 하는 세기
@@ -72,7 +73,7 @@ public class Actor_Grabable : MonoBehaviour
     public void Act_DistancePull(GameObject hand)
     {
         if (isGrabbed || isPulling) return;
-        StartCoroutine(PullRoutine(hand.transform));
+        pullRoutine = StartCoroutine(PullRoutine(hand.transform));
     }
 
     private System.Collections.IEnumerator PullRoutine(Transform hand)
@@ -109,6 +110,7 @@ public class Actor_Grabable : MonoBehaviour
 
         // 완전히 도착한 후 Grab 로직 실행
         isPulling = false;
+        pullRoutine = null;
         Act_Grab(hand.gameObject);
     }
 
@@ -153,12 +155,21 @@ public class Actor_Grabable : MonoBehaviour
 
     public void Act_Release() // hand = Holder/Hand
     {
+        if (pullRoutine != null)
+        {
+            StopCoroutine(pullRoutine);
+            pullRoutine = null;
+        }
+
         // 1. 부모 해제
         transform.SetParent(defaultParent);
 
         // 2. 물리 시뮬레이션 재개
-        rb.isKinematic = false;
-        rb.useGravity = true;
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+        }
 
         // 3. 상태 초기화
         isGrabbed = false;
