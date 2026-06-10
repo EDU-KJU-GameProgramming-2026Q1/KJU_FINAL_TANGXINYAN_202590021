@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody))]
 public class Actor_Grabable : MonoBehaviour
 {
     [Header("마우스 클릭으로 게임오브젝트의 쥐기/놓기를 제어하는 클래스.")]
@@ -33,13 +33,27 @@ public class Actor_Grabable : MonoBehaviour
     private void Awake()
     {
         defaultParent = transform.parent;
+        EnsureRigidbody();
+    }
+
+    private bool EnsureRigidbody()
+    {
+        if (rb != null) return true;
+
         rb = GetComponent<Rigidbody>();
+        if (rb != null) return true;
+
+        rb = gameObject.AddComponent<Rigidbody>();
+        if (rb != null) return true;
+
+        Debug.LogWarning($"[Actor_Grabable] Rigidbody missing on {gameObject.name}.");
+        return false;
     }
 
     public void Act_DistancePoke(GameObject hand)
     {
         Debug.Log($"Act_DistancePoke");
-        if (rb == null || isGrabbed) return;
+        if (!EnsureRigidbody() || isGrabbed || hand == null) return;
 
         // 플레이어로부터 물체 방향으로 힘을 가함
         Vector3 pushDirection = (transform.position - hand.transform.position).normalized;
@@ -53,7 +67,12 @@ public class Actor_Grabable : MonoBehaviour
     }
     public void Act_DistanceGrab(GameObject hand)
     {
-        PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grabing);
+        if (!EnsureRigidbody() || hand == null) return;
+
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Grabing);
+        }
         if (isGrabbed) return;
         isGrabbed = true;
 
@@ -72,7 +91,7 @@ public class Actor_Grabable : MonoBehaviour
 
     public void Act_DistancePull(GameObject hand)
     {
-        if (isGrabbed || isPulling) return;
+        if (!EnsureRigidbody() || hand == null || isGrabbed || isPulling) return;
         pullRoutine = StartCoroutine(PullRoutine(hand.transform));
     }
 
@@ -116,6 +135,8 @@ public class Actor_Grabable : MonoBehaviour
 
     public void Act_Grab(GameObject hand)
     {
+        if (!EnsureRigidbody() || hand == null) return;
+
         if (isGrabbed) return;
         isGrabbed = true;
         rb.isKinematic = true;
@@ -139,7 +160,7 @@ public class Actor_Grabable : MonoBehaviour
     public void Act_Release(GameObject hand) // hand = Holder/Hand
     {
         // Debug.Log("Actor_Grabable: Release");
-        if (!isGrabbed) return;
+        if (!EnsureRigidbody() || hand == null || !isGrabbed) return;
 
         // 상태 초기화
         Act_Release();

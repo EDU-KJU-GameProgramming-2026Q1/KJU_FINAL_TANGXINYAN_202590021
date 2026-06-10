@@ -65,20 +65,13 @@ public class ItemBehavior : MonoBehaviour
         item.transform.localRotation = Quaternion.identity;
         item.gameObject.SetActive(false);
 
-        // 맨손 상태 유지를 위한 상태 강제 초기화
-        // 새로 추가된 아이템이 첫 번째 아이템이든 아니든, 즉시 꺼내지(Equip) 않습니다.
         if (!IsEquipped)
         {
-            // 현재 손에 아무것도 들고 있지 않은 상태(itemBase == null)라면 안심하고 완전히 비워줍니다.
-            PlayerManager.Instance.SetInteractionState(PlayerInteractionState.Idle);
-            //PlayerManager.Instance.SetCurrentObject(null);
-            // 만약 PlayerManager.Instance.CurrentObject 프로퍼티가 가속기를 타지 않는다면 아래처럼 직접 대입도 안전합니다.
-            PlayerManager.Instance.CurrentObject = null;
+            EquipFromInventory(inventory.Count - 1);
         }
 
         Debug.Log($"<color=cyan>[ItemBehavior]</color> AddItem: {itemName} 추가됨. 현재 개수: {inventory.Count}");
         Debug.Log($"<color=cyan>[ItemBehavior]</color> AddItem --> EquipFromInventory");
-        //if (inventory.Count == 1) EquipFromInventory(0);
     }
 
     public void SwitchNextItem()

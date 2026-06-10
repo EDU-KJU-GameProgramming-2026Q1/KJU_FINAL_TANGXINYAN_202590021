@@ -8,6 +8,12 @@ public class Actor_Rifle : InterfaceBase_IItem
     public float BulletSpeed = 100f;
     public float BulletDamage = 5f;
 
+    [Header("Audio Options")]
+    public AudioClip ShootSound;
+    [Range(0f, 1f)] public float ShootVolume = 1f;
+    public AudioClip ReloadSound;
+    [Range(0f, 1f)] public float ReloadVolume = 1f;
+
     [Header("Ammo Options")]
     public int MagazineSize = 30;
     public int CurrentAmmo = 30;
@@ -15,6 +21,21 @@ public class Actor_Rifle : InterfaceBase_IItem
 
     private bool isFiring = false;
     private float lastFireTime;
+    private AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;
+        ShootSound?.LoadAudioData();
+        ReloadSound?.LoadAudioData();
+    }
 
     public override void OnEquip(GameObject itemHolder)
     {
@@ -71,6 +92,7 @@ public class Actor_Rifle : InterfaceBase_IItem
 
         CurrentAmmo--;
         UpdateAmmoUI();
+        PlayShootSound();
 
         Vector3 pos = FirePoint.position;
         Quaternion dir = FirePoint.rotation;
@@ -87,6 +109,13 @@ public class Actor_Rifle : InterfaceBase_IItem
         Destroy(bulletClone, 2f);
     }
 
+    void PlayShootSound()
+    {
+        if (ShootSound == null || audioSource == null) return;
+
+        audioSource.PlayOneShot(ShootSound, ShootVolume);
+    }
+
     void Reload()
     {
         if (CurrentAmmo >= MagazineSize) return;
@@ -99,8 +128,16 @@ public class Actor_Rifle : InterfaceBase_IItem
         ReserveAmmo -= reloadAmmo;
 
         UpdateAmmoUI();
+        PlayReloadSound();
 
         Debug.Log($"[Rifle] Reloaded: {CurrentAmmo}/{ReserveAmmo}");
+    }
+
+    void PlayReloadSound()
+    {
+        if (ReloadSound == null || audioSource == null) return;
+
+        audioSource.PlayOneShot(ReloadSound, ReloadVolume);
     }
 
     void UpdateAmmoUI()

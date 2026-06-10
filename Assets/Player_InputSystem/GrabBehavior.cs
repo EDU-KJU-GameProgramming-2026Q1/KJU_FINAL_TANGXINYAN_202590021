@@ -26,11 +26,26 @@ public class GrabBehavior : MonoBehaviour
 
     private void Start()
     {
-        grabingHand = PlayerManager.Instance.GetGrabHolder();
+        if (PlayerManager.Instance != null)
+        {
+            grabingHand = PlayerManager.Instance.GetGrabHolder();
+        }
     }
 
     void Update()
     {
+        if (PlayerManager.Instance == null || grabInput == null || pointingBehavior == null) return;
+
+        if (grabingHand == null)
+        {
+            grabingHand = PlayerManager.Instance.GetGrabHolder();
+            if (grabingHand == null)
+            {
+                Debug.LogWarning("[GrabBehavior] GrabHolder is missing. Check PlatformRigReferences.");
+                return;
+            }
+        }
+
         // 아이템을 이미 장착해서 손에 들고 있다면 그랩 로직 아예 중단
         if (PlayerManager.Instance.CurrentInteractionState == PlayerInteractionState.Looting)
         {

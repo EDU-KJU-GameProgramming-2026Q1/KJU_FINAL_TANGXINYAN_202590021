@@ -692,8 +692,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -830,6 +830,10 @@ MonoBehaviour:
   Bullet: {fileID: 1140185514427117624, guid: a35733c83237445caa0cc27adabc6be9, type: 3}
   BulletSpeed: 20
   BulletDamage: 5
+  ShootSound: {fileID: 8300000, guid: d9f06c43c8cce8a438dde85e9a0c7711, type: 3}
+  ShootVolume: 1
+  ReloadSound: {fileID: 8300000, guid: a76e1b3d7f2a4e748aa736c55c2b49e8, type: 3}
+  ReloadVolume: 1
 --- !u!114 &1371468900297504586
 MonoBehaviour:
   m_ObjectHideFlags: 0
